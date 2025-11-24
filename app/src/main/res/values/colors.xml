@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="example_7_yellow">#FFEB3B</color>  <!-- Bright yellow for selected day -->
+    <color name="example_7_white">#FFFFFF</color>   <!-- White for normal text -->
+</resources>
