@@ -1,0 +1,35 @@
+<resources>
+
+    <!-- MedBox Action Card Style -->
+    <style name="MedBoxActionCard">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_rowWeight">1</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/bg_action_card</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+
+    <!-- Title inside each card -->
+    <style name="ActionTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#2D3748</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <!-- Subtitle inside each card -->
+    <style name="ActionSubtitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">#718096</item>
+    </style>
+
+
+</resources>

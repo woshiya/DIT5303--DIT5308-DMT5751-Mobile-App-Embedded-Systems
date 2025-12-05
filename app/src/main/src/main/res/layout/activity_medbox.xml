@@ -1,0 +1,169 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA">
+
+    <!--  TOP BAR  -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="20dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_arrow_back"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="MedBox"
+            android:textColor="#2D3748"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginStart="20dp"/>
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_bell"/>
+    </LinearLayout>
+
+    <!--  MAIN CONTENT – FITS IN ONE SCREEN  -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!--  Subtitle  -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Device Connection and Settings"
+            android:textSize="14sp"
+            android:textColor="#718096"
+            android:layout_marginBottom="12dp"/>
+
+        <!--  MedBox Logo (smaller)  -->
+        <RelativeLayout
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:layout_width="130dp"
+                android:layout_height="130dp"
+                android:src="@drawable/ic_sun_rays"
+                android:layout_centerInParent="true"/>
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/ic_medbox_circle"
+                android:layout_centerInParent="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="medbox"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
+
+        <!--  Connected Status  -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Device Connected"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#2D3748"
+            android:layout_marginBottom="16dp"/>
+
+        <!--  4 Cards – Compact & Perfect  -->
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="2"
+            android:rowCount="2"
+            android:layout_marginTop="8dp">
+
+            <!--  Light Up  -->
+            <LinearLayout style="@style/MedBoxActionCard">
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_light_bulb"/>
+                <TextView
+                    android:text="Light Up"
+                    style="@style/ActionTitle"/>
+                <TextView
+                    android:text="Quick reminder"
+                    style="@style/ActionSubtitle"/>
+            </LinearLayout>
+
+            <!--  Open Box  -->
+            <LinearLayout style="@style/MedBoxActionCard">
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_open_box"/>
+                <TextView
+                    android:text="Open Box"
+                    style="@style/ActionTitle"/>
+                <TextView
+                    android:text="Quick access"
+                    style="@style/ActionSubtitle"/>
+            </LinearLayout>
+
+            <!--  Find Device  -->
+            <LinearLayout style="@style/MedBoxActionCard">
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_search_location"/>
+                <TextView
+                    android:text="Find Device"
+                    style="@style/ActionTitle"/>
+                <TextView
+                    android:text="Locate nearby devices"
+                    style="@style/ActionSubtitle"/>
+            </LinearLayout>
+
+            <!--  Disconnect  -->
+            <LinearLayout style="@style/MedBoxActionCard">
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_disconnect"/>
+                <TextView
+                    android:text="Disconnect"
+                    style="@style/ActionTitle"/>
+                <TextView
+                    android:text="Disconnect in one click"
+                    style="@style/ActionSubtitle"/>
+            </LinearLayout>
+        </GridLayout>
+
+        <!--  Flexible space to push cards up  -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
+</RelativeLayout>
