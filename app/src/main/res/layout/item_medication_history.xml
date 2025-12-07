@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/medication_item_bg"
+    android:padding="16dp"
+    android:layout_marginBottom="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Pill Icon -->
+        <View
+            android:id="@+id/pillIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/pill_icon_bg"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <!-- Medication Name -->
+            <TextView
+                android:id="@+id/tvMedicationName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medication Name"
+                android:textColor="#2D3748"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+
+            <!-- Dosage -->
+            <TextView
+                android:id="@+id/tvDosage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dosage"
+                android:textColor="#718096"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+
+            <!-- Time -->
+            <TextView
+                android:id="@+id/tvTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time"
+                android:textColor="#A0AEC0"
+                android:textSize="12sp"
+                android:layout_marginTop="4dp"/>
+        </LinearLayout>
+
+        <!-- Status Badge -->
+        <LinearLayout
+            android:id="@+id/statusBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="8dp"
+            android:background="@drawable/status_badge_bg">
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Taken"
+                android:textColor="#38A169"
+                android:textSize="12sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

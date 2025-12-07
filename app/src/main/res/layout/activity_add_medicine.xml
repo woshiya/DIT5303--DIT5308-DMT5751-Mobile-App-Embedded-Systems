@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA">
+
+    <!-- TOP BAR -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="Back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Medicine"
+            android:textColor="#2D3748"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginStart="20dp" />
+
+        <!-- FINISH BUTTON (Save) -->
+        <ImageView
+            android:id="@+id/btnFinish"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_bell"
+            android:contentDescription="Finish"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Medicine Name -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medicine Name"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D3748"
+                android:layout_marginBottom="8dp"/>
+
+            <EditText
+                android:id="@+id/etMedName"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:hint="e.g. Aspirin 81mg"
+                android:textSize="18sp"
+                android:background="@drawable/edittext_rounded"
+                android:padding="16dp"
+                android:layout_marginBottom="24dp"/>
+
+            <!-- How often? -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="How often?"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D3748"
+                android:layout_marginBottom="12dp"/>
+
+            <RadioGroup
+                android:id="@+id/radioGroupFrequency"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/big_rounded_gray"
+                android:padding="12dp"
+                android:layout_marginBottom="24dp">
+
+                <RadioButton android:id="@+id/rbOnce"     android:layout_width="match_parent" android:layout_height="56dp" android:text="Once a day"       android:textSize="18sp" android:paddingStart="16dp" android:gravity="center_vertical" android:layout_marginBottom="4dp"/>
+                <RadioButton android:id="@+id/rbTwice"    android:layout_width="match_parent" android:layout_height="56dp" android:text="Twice a day"      android:textSize="18sp" android:paddingStart="16dp" android:gravity="center_vertical" android:checked="true" android:layout_marginBottom="4dp"/>
+                <RadioButton android:id="@+id/rbThree"    android:layout_width="match_parent" android:layout_height="56dp" android:text="Three times a day" android:textSize="18sp" android:paddingStart="16dp" android:gravity="center_vertical" android:layout_marginBottom="4dp"/>
+                <RadioButton android:id="@+id/rbFour"    android:layout_width="match_parent" android:layout_height="56dp" android:text="Four times a day" android:textSize="18sp" android:paddingStart="16dp" android:gravity="center_vertical" android:layout_marginBottom="4dp"/>
+                <RadioButton android:id="@+id/rbAsNeeded" android:layout_width="match_parent" android:layout_height="56dp" android:text="As needed"        android:textSize="18sp" android:paddingStart="16dp" android:gravity="center_vertical"/>
+            </RadioGroup>
+
+            <!-- Custom schedule for "As needed" -->
+            <LinearLayout
+                android:id="@+id/llCustomSchedule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/big_rounded_gray"
+                android:padding="16dp"
+                android:layout_marginBottom="24dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Custom Schedule"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:textColor="#2D3748"
+                    android:layout_marginBottom="12dp"/>
+
+                <EditText
+                    android:id="@+id/etCustomDays"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="Enter days (e.g., Every 3 days, Mon/Wed/Fri)"
+                    android:textSize="16sp"
+                    android:background="@drawable/edittext_rounded"
+                    android:padding="12dp"
+                    android:layout_marginBottom="12dp"/>
+
+                <EditText
+                    android:id="@+id/etCustomTimes"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="Enter times (e.g., After meals, When in pain)"
+                    android:textSize="16sp"
+                    android:background="@drawable/edittext_rounded"
+                    android:padding="12dp"/>
+            </LinearLayout>
+
+            <!-- Instructions -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Instructions (optional)"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D3748"
+                android:layout_marginBottom="12dp"/>
+
+            <EditText
+                android:id="@+id/etInstructions"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:hint="e.g. Take with food • After breakfast"
+                android:textSize="18sp"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:background="@drawable/edittext_rounded"
+                android:padding="16dp"
+                android:layout_marginBottom="32dp"/>
+
+            <!-- Select times -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Notification (Select time required)"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D3748"
+                android:layout_marginBottom="12dp"/>
+
+            <LinearLayout
+                android:id="@+id/timeContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/big_rounded_gray"
+                android:padding="16dp"
+                android:layout_marginBottom="24dp">
+
+                <!-- Flow layout for selected times (auto wrap) -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/selectedTimesLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+                        <!-- Times will be added here dynamically -->
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Add Time Button -->
+                <ImageView
+                    android:id="@+id/btnAddTime"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@drawable/ic_add_circle"
+                    android:contentDescription="Add custom time"
+                    android:backgroundTint="#8D6E63"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="12dp"/>
+            </LinearLayout>
+
+            <!-- Medication Photo -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Medication Photo (optional)"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#2D3748"
+                android:layout_marginBottom="12dp"/>
+
+            <ImageView
+                android:id="@+id/ivMedPhoto"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/ic_medbox"
+                android:scaleType="centerCrop"
+                android:background="@drawable/big_rounded_gray"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"
+                android:clickable="true"
+                android:focusable="true"/>
+
+            <!-- Refill Reminder -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/big_rounded_gray"
+                android:padding="16dp"
+                android:layout_marginBottom="32dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:text="Notify me when to refill"
+                    android:textSize="18sp"/>
+
+                <Switch
+                    android:id="@+id/switchRefill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

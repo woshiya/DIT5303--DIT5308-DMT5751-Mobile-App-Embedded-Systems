@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="example_7_yellow">#FFEB3B</color>  <!-- Bright yellow for selected day -->
+    <color name="example_7_white">#FFFFFF</color>   <!-- White for normal text -->
+    <color name="primary_color">#8D6E63</color>
+    <color name="secondary_color">#A1887F</color>
+
+    <color name="box1_color">#FF6B6B</color>
+    <color name="box2_color">#4ECDC4</color>
+    <color name="box3_color">#FFD166</color>
+
+</resources>
