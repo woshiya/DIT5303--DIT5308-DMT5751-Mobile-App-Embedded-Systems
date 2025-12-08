@@ -1,10 +1,13 @@
 package ict.mgame.iotmedicinebox;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,6 +27,7 @@ public class TrackerActivity extends AppCompatActivity {
     private Button btnFilterAll, btnFilterTaken, btnFilterMissed;
     private Button btnClearAllData;
     private DatabaseHelper databaseHelper;
+    private BottomNavigationView bottomNav;
 
     private String currentFilter = "All";
 
@@ -43,6 +47,7 @@ public class TrackerActivity extends AppCompatActivity {
 
         initViews();
         setupFilterButtons();
+        setupBottomNavigation();
         loadMedicationHistory();
     }
 
@@ -54,20 +59,146 @@ public class TrackerActivity extends AppCompatActivity {
         btnFilterMissed = findViewById(R.id.btnFilterMissed);
         btnClearAllData = findViewById(R.id.btnClearAllData);
 
-        // Menu button (you can add drawer functionality if needed)
+        // Initialize bottom navigation
+        bottomNav = findViewById(R.id.bottomNavigationView);
+
+        // Method 2: If method 1 fails, try to find it in include
+        if (bottomNav == null) {
+            Log.d(TAG, "Direct search failed, trying alternative methods");
+            View includeView = null;
+
+            try {
+                includeView = findViewById(R.id.bottomNavInclude);
+                Log.d(TAG, "Found bottomNavInclude: " + (includeView != null));
+            } catch (Exception e) {
+                Log.d(TAG, "bottomNavInclude does not exist");
+            }
+
+            if (includeView != null) {
+                bottomNav = includeView.findViewById(R.id.bottomNavigationView);
+            }
+        }
+
+        // Method 3: Recursive search if still not found
+        if (bottomNav == null) {
+            Log.d(TAG, "Still not found, starting recursive search");
+            View rootView = findViewById(android.R.id.content).getRootView();
+            bottomNav = findBottomNavRecursive(rootView);
+        }
+
+        Log.d(TAG, "Final result - Bottom nav found: " + (bottomNav != null));
+
+        // Menu button
         findViewById(R.id.btnMenu).setOnClickListener(v -> {
-            // Open navigation drawer or menu
             Toast.makeText(this, "Menu clicked", Toast.LENGTH_SHORT).show();
         });
 
         // Notification button
         findViewById(R.id.btnNotification).setOnClickListener(v -> {
-            // Open notifications
             Toast.makeText(this, "Notifications clicked", Toast.LENGTH_SHORT).show();
         });
 
         // Clear all data button
         btnClearAllData.setOnClickListener(v -> showClearDataDialog());
+    }
+
+    // Recursively find BottomNavigationView
+    private BottomNavigationView findBottomNavRecursive(View view) {
+        if (view instanceof BottomNavigationView) {
+            return (BottomNavigationView) view;
+        }
+
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
+                View child = viewGroup.getChildAt(i);
+                BottomNavigationView result = findBottomNavRecursive(child);
+                if (result != null) {
+                    return result;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void setupBottomNavigation() {
+        if (bottomNav == null) {
+            Log.e(TAG, "Bottom navigation bar not found!");
+            return;
+        }
+
+        Log.d(TAG, "Starting bottom navigation setup");
+
+        // Set calendar/tracker as selected
+        bottomNav.setSelectedItemId(R.id.nav_calendar);
+
+        // Set navigation item selection listener
+        bottomNav.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            Log.d(TAG, "Clicked: " + item.getTitle());
+            return handleNavigation(itemId);
+        });
+
+        Log.d(TAG, "Bottom navigation setup complete");
+    }
+
+    // Handle navigation logic
+    private boolean handleNavigation(int itemId) {
+        if (itemId == R.id.nav_home) {
+            // Navigate to Home page
+            try {
+                Intent intent = new Intent(this, HomeActivity.class);
+                startActivity(intent);
+                finish(); // Close current activity
+            } catch (Exception e) {
+                Log.e(TAG, "Cannot open Home page: " + e.getMessage());
+                Toast.makeText(this, "Cannot open Home page", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+
+        } else if (itemId == R.id.nav_calendar) {
+            // Already on Tracker page
+            return true;
+
+        } else if (itemId == R.id.nav_add) {
+            // Navigate to Add Medicine page
+            try {
+                Intent intent = new Intent(this, AddMedicineActivity.class);
+                startActivity(intent);
+            } catch (Exception e) {
+                Log.e(TAG, "Cannot open add page: " + e.getMessage());
+                Toast.makeText(this, "Cannot open add page", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+
+        } else if (itemId == R.id.nav_medbox) {
+            // Navigate to MedBox control page
+            try {
+                Intent intent = new Intent(this, MedBoxActivity.class);
+                startActivity(intent);
+            } catch (Exception e) {
+                Log.e(TAG, "Cannot open MedBox page: " + e.getMessage());
+                Toast.makeText(this, "Cannot open MedBox page", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+
+        } else if (itemId == R.id.nav_chat) {
+            // Navigate to chat page
+            try {
+                Intent intent = new Intent(this, ChatActivity.class);
+                startActivity(intent);
+            } catch (Exception e) {
+                Log.e(TAG, "Cannot open chat page: " + e.getMessage());
+                Toast.makeText(this, "Chat feature temporarily unavailable", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+
+        } else if (itemId == R.id.nav_profile) {
+            Toast.makeText(this, "Profile feature coming soon", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+
+        return false;
     }
 
     private void setupFilterButtons() {
@@ -232,7 +363,18 @@ public class TrackerActivity extends AppCompatActivity {
                 .show();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        // Reselect calendar button when returning to tracker
+        if (bottomNav != null) {
+            bottomNav.setSelectedItemId(R.id.nav_calendar);
+        }
+
+        // Refresh medication history
+        loadMedicationHistory();
+    }
 
     @Override
     protected void onDestroy() {

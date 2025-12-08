@@ -19,6 +19,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomeActivity extends Activity {
 
+    private static final String TAG = "HomeActivity";
+
     private LinearLayout weekContainer;
     private HorizontalScrollView scrollView;
     private int selectedPosition = 500;
@@ -30,7 +32,7 @@ public class HomeActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        Log.d("HomeActivity", "onCreate started");
+        Log.d(TAG, "onCreate started");
 
         // Initialize database
         databaseHelper = new DatabaseHelper(this);
@@ -44,7 +46,7 @@ public class HomeActivity extends Activity {
 
         // Method 2: If method 1 fails, try to find it in include
         if (bottomNav == null) {
-            Log.d("HomeActivity", "Direct search failed, trying alternative methods");
+            Log.d(TAG, "Direct search failed, trying alternative methods");
 
             // Find include view
             View includeView = null;
@@ -52,9 +54,9 @@ public class HomeActivity extends Activity {
             // Try possible IDs - choose the correct one based on your layout file
             try {
                 includeView = findViewById(R.id.bottomNavInclude);
-                Log.d("HomeActivity", "Found bottomNavInclude: " + (includeView != null));
+                Log.d(TAG, "Found bottomNavInclude: " + (includeView != null));
             } catch (Exception e) {
-                Log.d("HomeActivity", "bottomNavInclude does not exist");
+                Log.d(TAG, "bottomNavInclude does not exist");
             }
 
             // If include view is found, search for BottomNavigationView inside it
@@ -65,12 +67,12 @@ public class HomeActivity extends Activity {
 
         // Method 3: If still not found, recursively search the entire view tree
         if (bottomNav == null) {
-            Log.d("HomeActivity", "Still not found, starting recursive search");
+            Log.d(TAG, "Still not found, starting recursive search");
             View rootView = findViewById(android.R.id.content).getRootView();
             bottomNav = findBottomNavRecursive(rootView);
         }
 
-        Log.d("HomeActivity", "Final result - Bottom nav found: " + (bottomNav != null));
+        Log.d(TAG, "Final result - Bottom nav found: " + (bottomNav != null));
 
         // Initialize calendar view
         initCalendarView();
@@ -148,14 +150,14 @@ public class HomeActivity extends Activity {
     private void setupBottomNavigation() {
         if (bottomNav == null) {
             // If still not found, show error but continue
-            Log.e("HomeActivity", "Bottom navigation bar not found!");
+            Log.e(TAG, "Bottom navigation bar not found!");
 
             // Add temporary buttons for testing navigation
             addTestNavigationButtons();
             return;
         }
 
-        Log.d("HomeActivity", "Starting bottom navigation setup");
+        Log.d(TAG, "Starting bottom navigation setup");
 
         // Set default selected menu item
         bottomNav.setSelectedItemId(R.id.nav_home);
@@ -164,12 +166,12 @@ public class HomeActivity extends Activity {
         bottomNav.setOnNavigationItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            Log.d("HomeActivity", "Clicked: " + item.getTitle());
+            Log.d(TAG, "Clicked: " + item.getTitle());
 
             return handleNavigation(itemId);
         });
 
-        Log.d("HomeActivity", "Bottom navigation setup complete");
+        Log.d(TAG, "Bottom navigation setup complete");
     }
 
     // Handle navigation logic
@@ -183,48 +185,62 @@ public class HomeActivity extends Activity {
             try {
                 Intent intent = new Intent(this, TrackerActivity.class);
                 startActivity(intent);
+                return true;
             } catch (Exception e) {
-                Log.e("HomeActivity", "Cannot open Tracker page: " + e.getMessage());
+                Log.e(TAG, "Cannot open Tracker page: " + e.getMessage());
                 Toast.makeText(this, "Cannot open Tracker page", Toast.LENGTH_SHORT).show();
+                return false;
             }
-            return true;
 
         } else if (itemId == R.id.nav_add) {
             // Navigate to Add Medicine page
             try {
                 Intent intent = new Intent(this, AddMedicineActivity.class);
                 startActivity(intent);
+                return true;
             } catch (Exception e) {
-                Log.e("HomeActivity", "Cannot open add page: " + e.getMessage());
+                Log.e(TAG, "Cannot open add page: " + e.getMessage());
                 Toast.makeText(this, "Cannot open add page", Toast.LENGTH_SHORT).show();
+                return false;
             }
-            return true;
 
         } else if (itemId == R.id.nav_medbox) {
             // Navigate to MedBox control page
             try {
                 Intent intent = new Intent(this, MedBoxActivity.class);
                 startActivity(intent);
+                return true;
             } catch (Exception e) {
-                Log.e("HomeActivity", "Cannot open MedBox page: " + e.getMessage());
+                Log.e(TAG, "Cannot open MedBox page: " + e.getMessage());
                 Toast.makeText(this, "Cannot open MedBox page", Toast.LENGTH_SHORT).show();
+                return false;
             }
-            return true;
 
         } else if (itemId == R.id.nav_chat) {
             // Navigate to chat page
             try {
                 Intent intent = new Intent(this, ChatActivity.class);
                 startActivity(intent);
+                return true;
             } catch (Exception e) {
-                Log.e("HomeActivity", "Cannot open chat page: " + e.getMessage());
+                Log.e(TAG, "Cannot open chat page: " + e.getMessage());
                 Toast.makeText(this, "Chat feature temporarily unavailable", Toast.LENGTH_SHORT).show();
+                return false;
             }
-            return true;
 
         } else if (itemId == R.id.nav_profile) {
-            Toast.makeText(this, "Profile feature coming soon", Toast.LENGTH_SHORT).show();
-            return true;
+            // Navigate to Profile page
+            try {
+                Intent intent = new Intent(this, ProfileActivity.class);
+                startActivity(intent);
+                Log.d(TAG, "Profile activity opened successfully");
+                return true;
+            } catch (Exception e) {
+                Log.e(TAG, "Cannot open Profile page: " + e.getMessage());
+                e.printStackTrace();
+                Toast.makeText(this, "Cannot open Profile page", Toast.LENGTH_SHORT).show();
+                return false;
+            }
         }
 
         return false;
@@ -236,8 +252,8 @@ public class HomeActivity extends Activity {
         testLayout.setOrientation(LinearLayout.VERTICAL);
         testLayout.setPadding(20, 20, 20, 20);
 
-        String[] buttonLabels = {"Test: Add Medicine", "Test: MedBox", "Test: Chat"};
-        Class<?>[] activities = {AddMedicineActivity.class, MedBoxActivity.class, ChatActivity.class};
+        String[] buttonLabels = {"Test: Add Medicine", "Test: MedBox", "Test: Chat", "Test: Profile"};
+        Class<?>[] activities = {AddMedicineActivity.class, MedBoxActivity.class, ChatActivity.class, ProfileActivity.class};
 
         for (int i = 0; i < buttonLabels.length; i++) {
             final Class<?> activityClass = activities[i];
@@ -252,7 +268,8 @@ public class HomeActivity extends Activity {
                     Intent intent = new Intent(this, activityClass);
                     startActivity(intent);
                 } catch (Exception e) {
-                    Toast.makeText(this, "Cannot open page", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Cannot open page: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error opening activity", e);
                 }
             });
 
@@ -285,7 +302,6 @@ public class HomeActivity extends Activity {
         loadMedicationsForSelectedDate();
     }
 
-    // The following methods remain unchanged...
     private View createDayView(Calendar cal) {
         View v = LayoutInflater.from(this).inflate(R.layout.item_week_day, weekContainer, false);
 
@@ -333,7 +349,7 @@ public class HomeActivity extends Activity {
     private void loadMedicationsForSelectedDate() {
         LinearLayout medicationList = findViewById(R.id.medicationList);
         if (medicationList == null) {
-            Log.e("HomeActivity", "medicationList not found");
+            Log.e(TAG, "medicationList not found");
             return;
         }
 
@@ -406,7 +422,7 @@ public class HomeActivity extends Activity {
             medicationList.addView(item);
         }
 
-        Log.d("HomeActivity", "Loaded " + medications.size() + " medications");
+        Log.d(TAG, "Loaded " + medications.size() + " medications");
     }
 
     private int getPillColorForBox(int boxNumber) {
