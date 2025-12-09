@@ -13,6 +13,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,6 +30,7 @@ public class BluetoothService extends Service {
     private BluetoothListener listener;
 
     private String targetDeviceName = "HC-05"; // Default device name
+    private String targetDeviceAddress = "";
 
     // Connection states
     public static final int STATE_NONE = 0;
@@ -39,6 +42,7 @@ public class BluetoothService extends Service {
         void onBluetoothDataReceived(String data);
         void onBluetoothStatusChanged(String status);
         void onBluetoothError(String error);
+        void onAvailableDevicesFound(List<BluetoothDevice> devices); // 新增：发现设备回调
     }
 
     public class LocalBinder extends Binder {
@@ -65,6 +69,10 @@ public class BluetoothService extends Service {
 
     public void setTargetDeviceName(String deviceName) {
         this.targetDeviceName = deviceName;
+    }
+
+    public void setTargetDeviceAddress(String address) {
+        this.targetDeviceAddress = address;
     }
 
     public boolean connect() {
@@ -107,6 +115,75 @@ public class BluetoothService extends Service {
         return true;
     }
 
+    // 新增：连接特定设备
+    public boolean connectToDevice(BluetoothDevice device) {
+        if (device == null) {
+            notifyError("Device is null");
+            return false;
+        }
+
+        setTargetDeviceName(device.getName());
+        setTargetDeviceAddress(device.getAddress());
+        return connect();
+    }
+
+    // 新增：搜索所有可能的MedBox设备
+    public List<BluetoothDevice> findAvailableMedBoxDevices() {
+        List<BluetoothDevice> availableDevices = new ArrayList<>();
+
+        if (bluetoothAdapter == null) {
+            return availableDevices;
+        }
+
+        if (!bluetoothAdapter.isEnabled()) {
+            return availableDevices;
+        }
+
+        Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
+        if (pairedDevices == null) {
+            return availableDevices;
+        }
+
+        for (BluetoothDevice device : pairedDevices) {
+            String deviceName = device.getName();
+            if (deviceName == null) continue;
+
+            String deviceNameLower = deviceName.toLowerCase();
+
+            // 更宽松的设备匹配逻辑
+            boolean isMedBoxDevice =
+                    deviceNameLower.contains("hc-05") ||
+                            deviceNameLower.contains("hc-06") ||
+                            deviceNameLower.contains("medbox") ||
+                            deviceNameLower.contains("box") ||
+                            (device.getAddress() != null && device.getAddress().startsWith("00:")) || // HC模块通常以00开头
+                            deviceNameLower.matches(".*bluetooth.*serial.*") ||
+                            deviceNameLower.contains("bt05") ||
+                            deviceNameLower.contains("bt06") ||
+                            deviceNameLower.contains("arduino") ||
+                            deviceNameLower.contains("servo") ||
+                            deviceNameLower.contains("bluetooth module");
+
+            if (isMedBoxDevice) {
+                availableDevices.add(device);
+                Log.d(TAG, "Found potential MedBox device: " + deviceName + " [" + device.getAddress() + "]");
+            }
+        }
+
+        // 如果没有找到特定设备，返回所有已配对设备
+        if (availableDevices.isEmpty()) {
+            availableDevices.addAll(pairedDevices);
+            Log.d(TAG, "No specific MedBox devices found, returning all paired devices");
+        }
+
+        // 通知监听器
+        if (listener != null && !availableDevices.isEmpty()) {
+            listener.onAvailableDevicesFound(availableDevices);
+        }
+
+        return availableDevices;
+    }
+
     private BluetoothDevice findTargetDevice() {
         if (bluetoothAdapter == null) return null;
 
@@ -114,12 +191,51 @@ public class BluetoothService extends Service {
         if (pairedDevices != null && pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
                 String deviceName = device.getName();
-                if (deviceName != null && deviceName.contains(targetDeviceName)) {
-                    Log.d(TAG, "Target device found: " + deviceName);
+
+                // 优先使用地址匹配（最准确）
+                if (!targetDeviceAddress.isEmpty() && device.getAddress() != null &&
+                        device.getAddress().equalsIgnoreCase(targetDeviceAddress)) {
+                    Log.d(TAG, "Target device found by address: " + deviceName + " [" + device.getAddress() + "]");
                     return device;
+                }
+
+                // 然后使用名称匹配
+                if (deviceName != null) {
+                    // 宽松的名称匹配
+                    if (deviceName.toLowerCase().contains(targetDeviceName.toLowerCase()) ||
+                            targetDeviceName.toLowerCase().contains(deviceName.toLowerCase())) {
+                        Log.d(TAG, "Target device found by name: " + deviceName);
+                        return device;
+                    }
+
+                    // 检查是否是可能的MedBox设备
+                    String deviceNameLower = deviceName.toLowerCase();
+                    if ((targetDeviceName.isEmpty() || targetDeviceName.equals("HC-05")) &&
+                            (deviceNameLower.contains("hc-05") ||
+                                    deviceNameLower.contains("hc-06") ||
+                                    deviceNameLower.contains("medbox") ||
+                                    deviceNameLower.contains("arduino"))) {
+                        Log.d(TAG, "Found MedBox device: " + deviceName);
+                        return device;
+                    }
                 }
             }
         }
+
+        // 如果没找到，尝试第一个HC-05/HC-06设备
+        if (pairedDevices != null) {
+            for (BluetoothDevice device : pairedDevices) {
+                String deviceName = device.getName();
+                if (deviceName != null) {
+                    String deviceNameLower = deviceName.toLowerCase();
+                    if (deviceNameLower.contains("hc-05") || deviceNameLower.contains("hc-06")) {
+                        Log.d(TAG, "Using first HC-05/HC-06 device: " + deviceName);
+                        return device;
+                    }
+                }
+            }
+        }
+
         return null;
     }
 

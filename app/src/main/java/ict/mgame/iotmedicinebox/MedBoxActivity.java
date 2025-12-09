@@ -42,10 +42,10 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
     private TextView connectionStatus;
     private BluetoothAdapter bluetoothAdapter;
 
-    private Handler mainHandler = new Handler();
+    private final Handler mainHandler = new Handler();
 
     // Service connection
-    private ServiceConnection serviceConnection = new ServiceConnection() {
+    private final ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             BluetoothService.LocalBinder binder = (BluetoothService.LocalBinder) service;
@@ -54,6 +54,11 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
             isBound = true;
 
             Log.d(TAG, "Bluetooth service connected");
+
+            // 自动搜索可用的MedBox设备
+            if (checkBluetoothPermissions()) {
+                scanForDevices();
+            }
         }
 
         @Override
@@ -131,7 +136,7 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
                         child.setClickable(true);
                         child.setOnClickListener(v -> {
                             if (checkBluetoothPermissions()) {
-                                connectBluetooth();
+                                showDeviceSelectionDialog();
                             }
                         });
                         break;
@@ -206,6 +211,16 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
         }
     }
 
+    // 新增：扫描设备方法
+    private void scanForDevices() {
+        if (bluetoothService != null) {
+            List<BluetoothDevice> devices = bluetoothService.findAvailableMedBoxDevices();
+            if (devices.isEmpty()) {
+                showToast("No MedBox devices found. Please pair a device first.");
+            }
+        }
+    }
+
     private void disconnectBluetooth() {
         if (bluetoothService != null) {
             bluetoothService.disconnect();
@@ -226,40 +241,95 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
             return;
         }
 
-        List<BluetoothDevice> bondedDevices = new ArrayList<>(bluetoothAdapter.getBondedDevices());
+        // 使用Service的方法搜索设备
+        if (bluetoothService != null) {
+            List<BluetoothDevice> availableDevices = bluetoothService.findAvailableMedBoxDevices();
 
-        if (bondedDevices.isEmpty()) {
-            showToast("No paired devices found");
-            return;
-        }
-
-        List<String> deviceNames = new ArrayList<>();
-        for (BluetoothDevice device : bondedDevices) {
-            String name = device.getName();
-            if (name != null && (name.contains("HC-05") || name.contains("HC-06"))) {
-                deviceNames.add(name);
+            if (availableDevices.isEmpty()) {
+                showNoDevicesDialog();
+                return;
             }
-        }
 
-        if (deviceNames.isEmpty()) {
-            showToast("No HC-05/HC-06 device found. Please pair first.");
-            return;
-        }
+            // 创建设备列表
+            List<String> deviceNames = new ArrayList<>();
+            for (BluetoothDevice device : availableDevices) {
+                String name = device.getName();
+                String address = device.getAddress();
+                if (name == null || name.isEmpty()) {
+                    deviceNames.add("Unknown Device [" + address + "]");
+                } else {
+                    deviceNames.add(name + " [" + address.substring(0, 8) + "...]");
+                }
+            }
 
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Select MedBox Device");
+            builder.setMessage("Choose which device to connect to:");
+
+            String[] devicesArray = deviceNames.toArray(new String[0]);
+            builder.setItems(devicesArray, (dialog, which) -> {
+                BluetoothDevice selectedDevice = availableDevices.get(which);
+                // 连接到选中的设备
+                if (bluetoothService != null) {
+                    bluetoothService.connectToDevice(selectedDevice);
+                    showToast("Connecting to " + selectedDevice.getName() + "...");
+                }
+            });
+
+            builder.setNegativeButton("Cancel", null);
+            builder.setNeutralButton("Manual Connect", (dialog, which) -> {
+                showManualConnectionDialog();
+            });
+
+            builder.show();
+        }
+    }
+
+    // 新增：手动连接对话框
+    private void showManualConnectionDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Device to Connect");
+        builder.setTitle("Manual Connection");
+        builder.setMessage("If your device is not listed, please:\n\n" +
+                "1. Go to Android Settings > Bluetooth\n" +
+                "2. Make sure MedBox is powered ON\n" +
+                "3. Pair with the device (usually named HC-05 or HC-06)\n" +
+                "4. Return here and tap 'Retry'");
 
-        String[] devicesArray = deviceNames.toArray(new String[0]);
-        builder.setItems(devicesArray, (dialog, which) -> {
-            String selectedDeviceName = deviceNames.get(which);
-            // Save selected device name for BluetoothService to use
-            if (bluetoothService != null) {
-                bluetoothService.setTargetDeviceName(selectedDeviceName);
-                connectBluetooth();
-            }
+        builder.setPositiveButton("Open Bluetooth Settings", (dialog, which) -> {
+            Intent intent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+            startActivity(intent);
         });
 
-        builder.setNegativeButton("Cancel", null);
+        builder.setNegativeButton("Retry", (dialog, which) -> {
+            showDeviceSelectionDialog();
+        });
+
+        builder.setNeutralButton("Cancel", null);
+        builder.show();
+    }
+
+    // 新增：无设备对话框
+    private void showNoDevicesDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("No Devices Found");
+        builder.setMessage("No MedBox devices found. Please ensure:\n\n" +
+                "✓ MedBox is powered ON\n" +
+                "✓ Bluetooth is enabled on both devices\n" +
+                "✓ Device is paired in Android Settings\n\n" +
+                "Common device names: HC-05, HC-06, MedBox, Arduino");
+
+        builder.setPositiveButton("Open Bluetooth Settings", (dialog, which) -> {
+            Intent intent = new Intent(android.provider.Settings.ACTION_BLUETOOTH_SETTINGS);
+            startActivity(intent);
+        });
+
+        builder.setNegativeButton("Try Demo Mode", (dialog, which) -> {
+            isConnected = true;
+            updateConnectionStatus();
+            showToast("Demo mode activated. You can now test controls.");
+        });
+
+        builder.setNeutralButton("Cancel", null);
         builder.show();
     }
 
@@ -386,6 +456,15 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
                         REQUEST_BLUETOOTH_PERMISSIONS);
                 return false;
             }
+        } else {
+            // For older versions, need location permission for Bluetooth scanning
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_BLUETOOTH_PERMISSIONS);
+                return false;
+            }
         }
         return true;
     }
@@ -403,7 +482,7 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
             }
 
             if (allGranted) {
-                connectBluetooth();
+                scanForDevices();
             } else {
                 showToast("Bluetooth permissions denied. Cannot connect.");
             }
@@ -415,7 +494,10 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE_BLUETOOTH) {
             if (resultCode == RESULT_OK) {
-                connectBluetooth();
+                // 给蓝牙一些时间启动
+                mainHandler.postDelayed(() -> {
+                    scanForDevices();
+                }, 1000);
             } else {
                 showToast("Bluetooth not enabled. Cannot connect.");
             }
@@ -428,7 +510,7 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
         Log.d(TAG, "Bluetooth data received: " + data);
         runOnUiThread(() -> {
             // Process received data here
-            if (data.contains("ACK")) {
+            if (data.contains("ACK") || data.contains("OK")) {
                 showToast("Command executed successfully");
             }
         });
@@ -441,7 +523,7 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
             if (status.contains("Connected")) {
                 isConnected = true;
                 showToast("MedBox connected successfully");
-            } else if (status.contains("Disconnected")) {
+            } else if (status.contains("Disconnected") || status.contains("Connection lost")) {
                 isConnected = false;
                 showToast("MedBox disconnected");
             }
@@ -457,6 +539,21 @@ public class MedBoxActivity extends Activity implements BluetoothService.Bluetoo
             updateConnectionStatus();
             showToast("Error: " + error);
         });
+    }
+
+    // 新增：可用设备发现回调
+    @Override
+    public void onAvailableDevicesFound(List<BluetoothDevice> devices) {
+        Log.d(TAG, "Found " + devices.size() + " available devices");
+        // 这里可以自动连接到第一个设备，或者显示通知
+        if (devices.size() == 1 && !isConnected) {
+            // 只有一个设备，自动连接
+            BluetoothDevice device = devices.get(0);
+            if (bluetoothService != null) {
+                showToast("Connecting to " + device.getName() + "...");
+                bluetoothService.connectToDevice(device);
+            }
+        }
     }
 
     // Helper methods
