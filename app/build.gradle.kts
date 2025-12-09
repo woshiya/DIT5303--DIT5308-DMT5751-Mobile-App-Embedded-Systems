@@ -43,9 +43,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(libs.legacy.support.v4)
-    implementation(libs.material.v1110)
-    implementation(libs.circleimageview)
+
 }
 
 configurations.all {

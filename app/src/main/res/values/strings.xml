@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">IOTMedicineBox</string>
+    <string name="box_medicine_format">Box %1$d Medicine</string>
 </resources>

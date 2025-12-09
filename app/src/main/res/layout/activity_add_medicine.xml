@@ -33,14 +33,20 @@
             android:textStyle="bold"
             android:layout_marginStart="20dp" />
 
-        <!-- FINISH BUTTON (Save) -->
-        <ImageView
-            android:id="@+id/btnFinish"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_bell"
-            android:contentDescription="Finish"
-            android:background="?attr/selectableItemBackgroundBorderless" />
+        <!-- SAVE BUTTON (在顶部) -->
+        <Button
+            android:id="@+id/btnSaveTop"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="SAVE"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:background="@drawable/button_rounded_primary"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:visibility="gone"/> <!-- 先隐藏，如果底部按钮可用则不需要这个 -->
+
     </LinearLayout>
 
     <ScrollView
@@ -256,6 +262,20 @@
                     android:checked="true"/>
 
             </LinearLayout>
+
+            <!-- 添加：底部保存按钮 -->
+            <Button
+                android:id="@+id/btnSaveBottom"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="SAVE MEDICATION"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:background="@drawable/button_rounded_primary"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="40dp"/>
+
         </LinearLayout>
     </ScrollView>
 </RelativeLayout>
