@@ -7,7 +7,7 @@
 <item
     android:id="@+id/nav_calendar"
     android:icon="@drawable/ic_calendar"
-    android:title="Tracker" />
+    android:title="Calendar" />
 <item
     android:id="@+id/nav_add"
     android:icon="@drawable/ic_add"

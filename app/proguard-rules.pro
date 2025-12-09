@@ -20,6 +20,7 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+
 -keep class net.sqlcipher.** { *; }
 -keep class javax.crypto.** { *; }
 -keep class net.zetetic.database.sqlcipher.* { *; }
@@ -27,3 +28,4 @@
 -keepattributes *Annotation*
 -keep class io.kommunicate.** { *; }
 -keep class io.kommunicate.ui.** { *; }
+

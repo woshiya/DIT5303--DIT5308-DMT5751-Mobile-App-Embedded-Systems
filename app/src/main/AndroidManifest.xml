@@ -3,13 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permissions -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -24,18 +29,13 @@
 
         <!-- Home Activity -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Home Activity -->
-        <activity
-            android:name=".HomeActivity"
-            android:exported="false" />
 
         <!-- MedBox Activity -->
         <activity
@@ -47,10 +47,29 @@
             android:name=".ChatActivity"
             android:exported="false" />
 
+        <!-- Reminder Activity -->
+        <activity
+            android:name=".ReminderActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
+            android:showOnLockScreen="true"
+            android:turnScreenOn="true"
+            android:showWhenLocked="true"
+            android:exported="false"
+            tools:ignore="AppLinkUrlError">
+
+            <!-- intent-filter 必须放在 activity 标签内 -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <!-- Bluetooth Service -->
-        <service android:name=".BluetoothService" />
-
-
+        <service
+            android:name=".BluetoothService"
+            android:exported="true" />
 
         <!-- Kommunicate Meta Data -->
         <meta-data
@@ -68,11 +87,9 @@
         <activity
             android:name=".TrackerActivity"
             android:exported="false" />
-
         <!-- Profile Activity -->
         <activity
             android:name=".ProfileActivity"
             android:exported="false" />
     </application>
-
 </manifest>
